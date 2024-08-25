@@ -8,16 +8,26 @@ public class ArrayDeque<T> {
     private static final int INITIAL_CAPACITY = 10;
 
     public int minusOne( int x){
-        return (x - 1 + items.length) % items.length;
+        if(items.length != 0){
+            return (x - 1 + items.length) % items.length;
+        }
+        else return 0;
     }
+
     public int plusOne( int x){
-        return (x + 1) % items.length;
+        if(items.length != 0){
+            return (x + 1) % items.length;
+        }
+        else return 0;
     }
 
     public void resize(int newSize){
+        if (newSize <= 0) {
+            throw new IllegalArgumentException("New size must be positive");
+        }
         T[] newItems = (T[]) new Object[newSize];
-        for(int i = 0; i <size - 1; i ++){
-            plusOne(nextFirst);
+        for(int i = 0; i <size; i ++){
+            nextFirst = plusOne(nextFirst);
             newItems[i] = items[nextFirst];
         }
         nextFirst = newSize - 1;
@@ -33,7 +43,7 @@ public class ArrayDeque<T> {
     }
 
     public void addLast(T x) {
-        if(size == items.length){
+        if(size == items.length-1){
             resize(size * 2);
         }
         items[nextLast] = x;
@@ -67,21 +77,29 @@ public class ArrayDeque<T> {
     }
 
     public T removeFirst(){
+        if(size == 0){
+            return null;
+        }
+        nextFirst = plusOne(nextFirst);
+        T remove = items[nextFirst];
+        size -= 1;
         if(size< items.length* 3 / 4){
             resize(size + 1);
         }
-        plusOne(nextFirst);
-        size -= 1;
-        return items[nextFirst];
+        return remove;
     }
 
     public T removeLast(){
+        if(size == 0){
+            return null;
+        }
         if(size< items.length* 3 / 4){
             resize(size + 1);
         }
-        minusOne(nextLast);
+        nextLast = minusOne(nextLast);
+        T remove = items[nextLast];
         size -= 1;
-        return items[nextLast];
+        return remove;
     }
 
     public T get(int index){
@@ -89,8 +107,8 @@ public class ArrayDeque<T> {
             return null;
         }
         int get = nextFirst;
-        for(int i = 0; i < index;i++){
-            plusOne(get);
+        for(int i = -1; i < index;i++){
+            get = plusOne(get);
         }
         return items[get];
     }
